@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>inFORMed | Proposed Platform Architecture and Data Framework</title>
+<style>
+:root{--ink:#172536;--muted:#5d6b7a;--navy:#15324b;--blue:#2b6688;--teal:#267b78;--pale:#eef4f7;--line:#d9e2e8;--soft:#f7f9fb}
+*{box-sizing:border-box}body{margin:0;background:#edf1f4;color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;line-height:1.62}
+.page{width:min(1060px,calc(100% - 36px));margin:32px auto;background:#fff;box-shadow:0 12px 40px rgba(19,43,61,.09);border-radius:14px;overflow:hidden}
+.cover{padding:64px 72px 54px;color:#fff;background:linear-gradient(135deg,#15324b,#205b76 62%,#267b78)}
+.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:11px;font-weight:700;opacity:.8}
+h1{font-size:clamp(38px,6vw,60px);line-height:1.04;letter-spacing:-.04em;margin:24px 0 14px}
+.subtitle{max-width:700px;font-size:20px;line-height:1.45;color:#e6f0f4;margin:0}
+.cover-meta{display:flex;flex-wrap:wrap;gap:28px;margin-top:48px;padding-top:20px;border-top:1px solid #ffffff40;font-size:13px;color:#e0ebf0}
+main{padding:46px 72px 64px}h2{color:var(--navy);font-size:25px;line-height:1.25;margin:46px 0 16px;letter-spacing:-.02em}h2:first-child{margin-top:0}
+h3{color:var(--blue);font-size:17px;margin:26px 0 8px}p{margin:0 0 14px}.lead{font-size:18px;color:#34495b;line-height:1.7}
+.callout{border-left:4px solid var(--teal);background:var(--pale);padding:18px 22px;margin:22px 0;border-radius:0 8px 8px 0}
+.architecture{margin:28px 0 16px;padding:26px;background:var(--soft);border:1px solid var(--line);border-radius:12px}
+.arch-title{text-align:center;color:var(--navy);font-weight:750;font-size:18px;margin-bottom:18px}
+.layer{border:1px solid #cbd9e2;border-radius:9px;padding:13px 16px;text-align:center;background:#fff;max-width:720px;margin:0 auto}
+.layer b{display:block;color:var(--navy);font-size:15px}.layer span{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+.ui{background:#eaf2f7;border-color:#b9cedb}.workflow{background:#eaf4f4;border-color:#b9d8d5}.storage{background:#f2f2f8;border-color:#d0cfe2}
+.arrow{text-align:center;color:#6f8798;font-size:23px;line-height:1.25;height:30px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:720px;margin:0 auto}
+.rules{background:#edf6f2;border-color:#c5dfd2}.knowledge{background:#eef4fa;border-color:#c8d8e8}.docs{background:#f1eff9;border-color:#d5d0e7}
+.ai-band{max-width:720px;margin:18px auto 0;padding:12px 16px;border:1px dashed #9bb5c5;border-radius:8px;text-align:center;color:#36566a;background:#f4f8fa;font-size:13px}
+.caption{font-size:12px;color:var(--muted);text-align:center;margin-top:13px}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:18px 0}.card{border:1px solid var(--line);border-radius:10px;padding:18px;background:#fff}.card h3{margin:0 0 7px}.card p{color:#4b5b69;font-size:14px;margin:0}
+table{width:100%;border-collapse:collapse;margin:18px 0 24px;font-size:14px}th{background:#eaf1f5;color:var(--navy);text-align:left;font-weight:700}th,td{border:1px solid var(--line);padding:11px 13px;vertical-align:top}tr:nth-child(even) td{background:#fafcfd}
+ul,ol{padding-left:22px;margin:8px 0 18px}li{margin:6px 0}
+.steps{counter-reset:step;list-style:none;padding:0;margin:22px 0}.steps li{counter-increment:step;position:relative;padding:0 0 22px 48px;margin:0 0 0 15px;border-left:2px solid #d5e1e7}.steps li:last-child{border-left-color:transparent;padding-bottom:0}
+.steps li:before{content:counter(step);position:absolute;left:-16px;top:0;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;background:var(--blue);font-weight:700;font-size:13px}
+.steps strong{color:var(--navy);display:block;margin-bottom:3px}
+.note{background:#fbf5e9;border:1px solid #eadbb9;border-radius:9px;padding:16px 18px;margin:18px 0;color:#594b30;font-size:14px}
+.phase-box{margin:10px 0 4px;display:grid;gap:10px}
+.phase-box h4{margin:6px 0 2px;color:var(--teal);font-size:13px;text-transform:uppercase;letter-spacing:.08em}
+.phase-box ul{margin:2px 0 6px}
+.phase-box p{margin:0 0 6px}
+.done{background:var(--pale);border-radius:8px;padding:10px 14px;font-size:14px}
+.small{font-size:13px;color:var(--muted)}
+pre{background:#15324b;color:#e8f1f6;border-radius:9px;padding:16px 18px;overflow-x:auto;font-size:12.5px;line-height:1.55;margin:14px 0 20px}
+dl.gloss{display:grid;grid-template-columns:220px 1fr;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:18px 0}
+dl.gloss dt,dl.gloss dd{margin:0;padding:11px 14px;border-bottom:1px solid var(--line)}
+dl.gloss dt{background:#eaf1f5;color:var(--navy);font-weight:700}
+dl.gloss dt:last-of-type,dl.gloss dd:last-of-type{border-bottom:0}
+@media(max-width:700px){dl.gloss{grid-template-columns:1fr}dl.gloss dt{border-bottom:0}}
+.footer{border-top:1px solid var(--line);padding-top:22px;margin-top:48px;display:flex;justify-content:space-between;gap:16px;color:var(--muted);font-size:12px}
+@media(max-width:700px){.page{width:100%;margin:0;border-radius:0}.cover{padding:42px 26px 36px}main{padding:32px 26px 44px}.two-col,.cards{grid-template-columns:1fr}.architecture{padding:16px 10px}.cover-meta{margin-top:30px;gap:12px 22px}table{display:block;overflow-x:auto}.footer{flex-direction:column}}
+@media print{body{background:#fff}.page{width:100%;margin:0;box-shadow:none;border-radius:0}.cover{print-color-adjust:exact;-webkit-print-color-adjust:exact}main{padding:32px 48px}.architecture,.card,table,.callout,.note{break-inside:avoid}h2,h3{break-after:avoid}}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="cover">
+<div class="eyebrow">Product and technical concept document</div>
+<h1>inFORMed</h1>
+<p class="subtitle">Proposed Platform Architecture and Data Framework</p>
+<div class="cover-meta">
+<div><strong>Prepared by</strong><br>Zione Kamtambe</div>
+<div><strong>Focus</strong><br>Legal process assistance and document preparation</div>
+<div><strong>Initial module</strong><br>Protection order applications</div>
+<div><strong>Status</strong><br>Proposed architecture for discussion</div>
+</div>
+</header>
+<main>
+<h2>1. Purpose and product direction</h2>
+<p class="lead">inFORMed is envisaged as a modular legal assistance platform that helps people understand and navigate legal processes, prepare the information required for applications, and generate relevant legal documents.</p>
+<p>The initial module will focus on helping people prepare protection order applications. The platform should be designed to accommodate additional legal tools in the future without requiring a complete rebuild for each new service.</p>
+<div class="callout"><strong>Core product principle</strong><br>inFORMed should combine structured legal workflows, verified legal information and document automation, supported by AI where it adds value. AI should assist the process, but should not become the authority that determines a person's legal rights or makes legal decisions.</div>
+<p>The platform should help users complete the relevant steps while keeping them in control of the information they provide and the documents they prepare. It should not invent facts, guarantee legal outcomes or present unverified AI interpretations as established law.</p>
+
+<h2>2. Proposed platform architecture</h2>
+<p>The architecture separates the user experience, legal workflows, legal rules, legal knowledge, document generation and secure case information. This separation makes the system easier to maintain, validate and extend to other legal processes.</p>
+<div class="architecture">
+<div class="arch-title">inFORMed platform architecture</div>
+<div class="layer ui"><b>1. User interface</b><span>Web or mobile experience · Accessible forms · Guided questions · Progress and review</span></div>
+<div class="arrow">↓</div>
+<div class="layer workflow"><b>2. Workflow engine</b><span>Question sequencing · Conditional branching · Validation · Consent · Progress management</span></div>
+<div class="arrow">↓</div>
+<div class="two-col">
+<div class="layer rules"><b>3A. Legal rules engine</b><span>Approved legal rules · Required fields · Exceptions · Jurisdiction-specific pathways</span></div>
+<div class="layer knowledge"><b>3B. Legal knowledge service</b><span>Legislation · Regulations · Official forms · Court guidance · Approved explanations</span></div>
+</div>
+<div class="arrow">↓</div>
+<div class="layer docs"><b>4. Document generation and review</b><span>Official templates · Field mapping · Completeness checks · User review · Export</span></div>
+<div class="arrow">↓</div>
+<div class="layer storage"><b>5. Secure data and audit layer</b><span>Case records · Access controls · Encryption · Retention and deletion · Audit logs</span></div>
+<div class="ai-band"><strong>AI services across the platform:</strong> natural-language understanding, retrieval, plain-language explanations and assistance organising user-provided information. AI outputs remain subject to workflow rules, validation and user review.</div>
+<p class="caption">Conceptual architecture. Components may be implemented as services or modules within the existing application infrastructure.</p>
+</div>
+
+<h3>2.1 User interface</h3><p>The interface should provide a clear, accessible and supportive experience. Users may be completing a legal application under stressful circumstances, so questions should be easy to understand, presented in manageable sections and accompanied by clear explanations.</p>
+<h3>2.2 Workflow engine</h3><p>The workflow engine manages the application process. It determines which questions are presented, in what order, and which additional questions are required based on a user's answers. It should support conditional pathways rather than forcing every applicant through an identical questionnaire.</p>
+<h3>2.3 Legal rules engine</h3><p>This component applies approved legal and procedural rules. It identifies applicable requirements, required information, exceptions and relevant workflow paths. Rules should be traceable to their legal sources and approved by designated legal reviewers.</p>
+<h3>2.4 Legal knowledge service</h3><p>This service makes verified legal information available to the platform. Retrieval-augmented generation (RAG) may be used to retrieve relevant legislation, regulations, official forms and approved explanations. Retrieved information should include source references and should not override explicit workflow rules.</p>
+<p>RAG means that, before the AI answers, the system searches the approved legal knowledge for the passages that are relevant to the question and gives only those passages to the AI, together with their references. The AI then answers from those passages rather than from its general training. For a single legal module with a small, approved knowledge base, the whole approved knowledge can instead be given to the AI on every turn, which removes the risk of a search missing the right passage. Retrieval becomes necessary as the knowledge grows, for example when several legal modules exist or when the platform includes a directory of courts, police stations and support services. In both cases only approved content is used, and every answer can be traced to its source.</p>
+<h3>2.5 Document generation and review</h3><p>Information collected through the workflow is mapped to the relevant official templates. The system checks whether required fields have been completed, generates draft documents and gives the user an opportunity to review and correct them before export.</p>
+<h3>2.6 Secure data and audit layer</h3><p>This layer protects personal case information, manages access and records important actions. It should support appropriate retention and deletion, and distinguish individual case records from the platform's general legal knowledge.</p>
+<p>The simplest and safest design keeps case information on the applicant's own device, so that nothing about their case is held by GRIT. This layer becomes essential if a later decision is made to store applications, for example so that a paralegal can review them or so that an applicant can continue on another device. In that case, every record is encrypted, stored in South Africa, deleted after an approved period, and every view, change and export is logged with who did it and when.</p>
+
+<h2>3. Data framework</h2>
+<p>Unlike a conversational support system that may rely heavily on community knowledge, inFORMed requires structured legal and procedural information. Data should be organised according to its purpose and kept in separate repositories or logical data domains.</p>
+<table><thead><tr><th>Data category</th><th>Examples of information</th><th>Purpose</th></tr></thead><tbody>
+<tr><td><strong>Legislation and legal sources</strong></td><td>Acts, amendments, regulations, relevant legal sections and official guidance.</td><td>Establishes the legal foundation and source of authority.</td></tr>
+<tr><td><strong>Official documents</strong></td><td>Application forms, affidavits, notices, supporting forms and document instructions.</td><td>Supports accurate preparation of official documents.</td></tr>
+<tr><td><strong>Legal procedures</strong></td><td>Application steps, filing requirements, deadlines, court processes and procedural guidance.</td><td>Defines the process users need to navigate.</td></tr>
+<tr><td><strong>Legal rules</strong></td><td>Conditions, exceptions, required information, decision pathways and validation rules.</td><td>Controls workflow logic and determines which requirements apply.</td></tr>
+<tr><td><strong>Court and service information</strong></td><td>Court locations, contact details, operating procedures and verified support services.</td><td>Helps users understand where and how to take the next steps.</td></tr>
+<tr><td><strong>Plain-language explanations</strong></td><td>Approved explanations of legal terms, rights, processes and document requirements.</td><td>Makes legal information easier to understand.</td></tr>
+<tr><td><strong>Workflow examples</strong></td><td>Approved scenarios, alternative pathways and examples of missing or incomplete information.</td><td>Supports workflow design and testing.</td></tr>
+<tr><td><strong>Evaluation data</strong></td><td>Test cases, expected outputs, edge cases and failure scenarios.</td><td>Measures accuracy, completeness, consistency and safety.</td></tr>
+</tbody></table>
+<p>The categories above have different owners and different rules. Legislation, official documents, procedures, rules and explanations are not personal information: they can be collected widely, but every item must be accurate, current and approved by a legal reviewer. Evaluation data is created specifically for testing and must never contain real people's cases. Individual case information, described below, is the opposite: it is highly sensitive and should be collected only to the extent the legal process requires.</p>
+<h3>3.1 Individual application and case information</h3>
+<p>Information entered by a user during an application must be treated separately from the legal knowledge repository. Depending on the applicable legal process, this may include:</p>
+<ul><li>Applicant and respondent details.</li><li>The relationship between the applicant and respondent, where legally relevant.</li><li>The applicant's description of incidents, including dates and locations where known.</li><li>Information about children or dependants, where relevant.</li><li>Details of the protection being requested.</li><li>Supporting information and evidence details.</li><li>Information required to complete the applicable official forms.</li></ul>
+<div class="note"><strong>Data separation:</strong> Individual case information is not community knowledge. It should not automatically be added to the RAG repository, shared across cases or used to train AI models. Access and processing must be governed by the approved privacy, security and legal requirements.</div>
+
+<h2>4. Legal knowledge repository structure</h2>
+<p>Each legal source should have sufficient metadata to establish where it came from, which jurisdiction it applies to, whether it is current and whether it has been legally reviewed.</p>
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>document_id</code></td><td>Unique identifier for the source.</td></tr><tr><td><code>legal_tool</code></td><td>The legal module the source belongs to, such as protection orders.</td></tr><tr><td><code>jurisdiction</code></td><td>Country and relevant legal jurisdiction.</td></tr><tr><td><code>document_type</code></td><td>Act, regulation, official form, procedure or approved guidance.</td></tr><tr><td><code>title</code></td><td>Official or approved document title.</td></tr><tr><td><code>source_url</code></td><td>Link to the authoritative source, where available.</td></tr><tr><td><code>legal_reference</code></td><td>Relevant section, regulation, schedule or form number.</td></tr><tr><td><code>effective_date</code></td><td>Date from which the provision or document applies.</td></tr><tr><td><code>version</code></td><td>Version of the source or approved content.</td></tr><tr><td><code>reviewed_by</code></td><td>Person or role responsible for legal review.</td></tr><tr><td><code>review_date</code></td><td>Date of the most recent review.</td></tr><tr><td><code>approval_status</code></td><td>Draft, under review, approved or superseded.</td></tr><tr><td><code>content</code></td><td>Extracted or approved content used by the platform.</td></tr>
+</tbody></table>
+<p>For example, a record for the protection order application form could look like this:</p>
+<pre>{
+  "document_id": "za-po-form6-j480e",
+  "legal_tool": "protection_order",
+  "jurisdiction": "South Africa",
+  "document_type": "official_form",
+  "title": "Form 6 and Form 6A: Application for a protection order (J480E)",
+  "source_url": "https://www.justice.gov.za",
+  "legal_reference": "Domestic Violence Regulations, Form 6 and Form 6A",
+  "effective_date": "2025-03-07",
+  "version": "J480E, March 2025",
+  "reviewed_by": "GRIT legal reviewer",
+  "review_date": "to be completed at sign-off",
+  "approval_status": "under_review",
+  "content": "Field list, section headings and instructions extracted from the official form"
+}</pre>
+<p>Only records with the status "approved" are made available to users or to the AI. Every record should also have a next review date, so that legal content is checked regularly and not only when someone notices a change.</p>
+<p>Superseded legal sources should be retained for audit and historical traceability where appropriate, but must not be presented as current guidance. The system should have a controlled process for reviewing and updating legal content when laws, regulations or official forms change.</p>
+
+<h2>5. Protection order application workflow</h2>
+<p>The first legal module should be mapped from the actual legal process and current official forms. The workflow below is an initial product model and must be validated by GRIT's legal team before implementation.</p>
+<ol class="steps">
+<li><strong>Start application</strong>Explain the purpose and limitations of the tool, provide the relevant privacy information and obtain appropriate consent.</li>
+<li><strong>Identify the applicant</strong>Establish whether the person is applying for themselves or assisting someone else, and identify any additional requirements for that pathway.</li>
+<li><strong>Understand the circumstances</strong>Collect relevant facts through carefully designed questions. Allow the applicant to describe events in their own words.</li>
+<li><strong>Identify the applicable legal pathway</strong>Use legally approved rules to identify the relevant requirements and any additional questions.</li>
+<li><strong>Identify the protection requested</strong>Explain the available options under the applicable law and allow the applicant to indicate what they are seeking.</li>
+<li><strong>Collect supporting information</strong>Gather the information required for the application and any supporting documents.</li>
+<li><strong>Generate the application</strong>Map validated answers to the appropriate official templates and produce draft documents.</li>
+<li><strong>Review and export</strong>Allow the applicant to review and correct the documents, then download them with clear information about the next steps.</li>
+</ol>
+<h3>5.1 How the workflow relates to the official form</h3>
+<p>The current official application is Form 6, with the applicant's confidential personal details on Form 6A (court form J480E, March 2025). The workflow steps above gather the information for its ten sections:</p>
+<table><thead><tr><th>Form 6 section</th><th>Information required</th><th>Workflow step</th></tr></thead><tbody>
+<tr><td>1. Applicant details</td><td>Names, identity number or date of birth, contact details, address, relationship to the respondent</td><td>Identify the applicant</td></tr>
+<tr><td>2. Person applying on behalf of the applicant</td><td>Name, capacity, reason, written consent of the applicant where required</td><td>Identify the applicant</td></tr>
+<tr><td>3. Respondent details</td><td>Name, relationship, identity details if known, where the respondent can be found</td><td>Understand the circumstances</td></tr>
+<tr><td>4. Other people affected</td><td>Children and other people affected, and how</td><td>Understand the circumstances</td></tr>
+<tr><td>5. Description of the domestic violence</td><td>History of abuse, specific incidents with dates, places, injuries and treatment</td><td>Understand the circumstances</td></tr>
+<tr><td>6. Urgency</td><td>Why an interim order is needed, weapons, threats, fear</td><td>Identify the applicable legal pathway</td></tr>
+<tr><td>7. Orders requested</td><td>What the respondent should be prohibited from doing</td><td>Identify the protection requested</td></tr>
+<tr><td>8. Additional conditions</td><td>Seizure of weapons, police assistance, rent, maintenance, emergency monetary relief, keeping the address confidential</td><td>Identify the protection requested</td></tr>
+<tr><td>9. Personal property</td><td>Belongings to be collected</td><td>Identify the protection requested</td></tr>
+<tr><td>10. Police station, court and documents</td><td>Police station for reporting a breach, court, documents attached</td><td>Collect supporting information</td></tr>
+</tbody></table>
+<p>Sections 5, 6 and 7 carry the most weight, because the magistrate decides mainly on what happened, why it is urgent and what the applicant is asking for. They are also where applicants most need support, because people rarely tell their story in the order a form expects.</p>
+<p>The system should preserve the applicant's original account. AI may help organise information into relevant sections, but it must not add facts, strengthen allegations or convert uncertainty into certainty. The applicant should be able to review and correct any AI-assisted wording.</p>
+<p>Where relevant, the system should distinguish between what the applicant personally experienced, what another person told them, what they believe happened and what they are unsure about.</p>
+
+<h2>6. Reusable modular design for future legal tools</h2>
+<p>The platform should use shared services while keeping each legal process independently configurable. This will allow new legal tools to be added without rebuilding the core platform.</p>
+<div class="architecture">
+<div class="arch-title">Shared platform and independent legal modules</div>
+<div class="layer ui"><b>Shared inFORMed platform services</b><span>User accounts · Consent · Secure case storage · Document generation · Notifications · Audit logs · Access management</span></div>
+<div class="arrow">↓</div>
+<div class="two-col">
+<div class="layer rules"><b>Protection order module</b><span>Its own legal sources, rules, workflow, templates and evaluation tests</span></div>
+<div class="layer knowledge"><b>Future legal module A</b><span>Independent legal content, process and validation</span></div>
+<div class="layer docs"><b>Future legal module B</b><span>Independent legal content, process and validation</span></div>
+<div class="layer storage"><b>Future legal module C</b><span>Independent legal content, process and validation</span></div>
+</div>
+<p class="caption">Shared infrastructure supports multiple legal tools, while each tool maintains its own legal rules and knowledge boundaries.</p>
+</div>
+<p>Each legal module should have its own:</p>
+<ul><li>Legal knowledge repository and approved sources.</li><li>Jurisdiction and applicable legislation.</li><li>Workflow definitions and branching logic.</li><li>Legal rules and validation requirements.</li><li>Official document templates.</li><li>Evaluation dataset and test scenarios.</li><li>Designated legal reviewer and approval process.</li></ul>
+<p>Shared services should be reusable, but retrieval and access controls must prevent one legal module from unintentionally using another module's legal content, rules or case records.</p>
+
+<h2>7. Role of AI within inFORMed</h2>
+<p>AI should be used where it improves accessibility, comprehension and the handling of natural-language information. It should not replace explicit legal rules or the authority of legal professionals and courts.</p>
+<table><thead><tr><th>Function</th><th>Proposed approach</th></tr></thead><tbody>
+<tr><td>Guiding users through questions</td><td>Structured workflows, with AI-assisted clarification where appropriate.</td></tr>
+<tr><td>Understanding free-text descriptions</td><td>Natural-language processing and AI, with user confirmation.</td></tr>
+<tr><td>Identifying missing information</td><td>Rules-based validation.</td></tr>
+<tr><td>Determining which questions apply</td><td>Approved legal rules and workflow logic.</td></tr>
+<tr><td>Explaining legal terms and processes</td><td>RAG using verified legal sources and approved plain-language content.</td></tr>
+<tr><td>Identifying relevant legal provisions</td><td>Retrieval with source references and legal validation.</td></tr>
+<tr><td>Populating official forms</td><td>Structured field mapping and validated user responses.</td></tr>
+<tr><td>Preparing affidavits or statements</td><td>Controlled templates using user-approved facts, without adding or embellishing details.</td></tr>
+<tr><td>Checking documents</td><td>Rules-based completeness checks, with AI assistance for language and consistency.</td></tr>
+<tr><td>Making legal decisions</td><td>Reserved for the appropriate human or legal authority, not the AI system.</td></tr>
+</tbody></table>
+
+<h2>8. Privacy, security and responsible data handling</h2>
+<p>Protection order applications may contain identity information, allegations of abuse, health information, information about children and potentially sensitive evidence. Privacy and security requirements must therefore be incorporated into the architecture from the beginning.</p>
+<ul>
+<li><strong>Data minimisation:</strong> Collect only information required for the relevant legal process or clearly justified product function.</li>
+<li><strong>Encryption:</strong> Protect information in transit and at rest.</li>
+<li><strong>Access control:</strong> Limit access to authorised people based on role and legitimate need.</li>
+<li><strong>Data separation:</strong> Keep legal knowledge, evaluation data and individual case records separate.</li>
+<li><strong>Consent and transparency:</strong> Explain what information is collected, why it is needed and how it will be used.</li>
+<li><strong>Retention and deletion:</strong> Establish and implement approved retention periods and deletion processes.</li>
+<li><strong>Auditability:</strong> Record relevant access, changes, exports and administrative actions.</li>
+<li><strong>AI processing controls:</strong> Assess and approve any transfer of sensitive information to external AI services.</li>
+<li><strong>Training restrictions:</strong> Do not use identifiable case information to train external models without the necessary legal basis and written approval.</li>
+</ul>
+<p>Data protection requirements, including applicable requirements under POPIA and other relevant laws, should be reviewed with the appropriate legal and data protection leads before deployment.</p>
+<h3>8.1 What this means in practice</h3>
+<ul>
+<li><strong>Special personal information:</strong> POPIA gives extra protection to certain kinds of information, including information about health and about alleged criminal behaviour. Descriptions of abuse and injuries fall into this category, so the platform needs a clear legal basis for processing them.</li>
+<li><strong>Children's personal information:</strong> Information about children affected by the abuse is also specially protected and must be handled with particular care.</li>
+<li><strong>External AI services:</strong> When an AI model hosted outside South Africa processes what an applicant writes, personal information is transferred across borders. This must be assessed before deployment, with an agreement in place with the provider that sets out how the information is handled and confirms it is not used to train their models.</li>
+<li><strong>Information Officer:</strong> GRIT's Information Officer is responsible for POPIA compliance and should sign off the data protection assessment before any pilot with real applicants.</li>
+<li><strong>Privacy notice:</strong> Applicants should be told, in plain language and in their own language, what is collected, who can see it, how long it is kept, how to delete it, and the risks of using a shared phone.</li>
+</ul>
+
+<h2>9. Development and implementation phases</h2>
+<p>The work is organised in six phases. Each phase has a clear purpose, a set of activities, defined outputs and a point at which it is considered complete. Later phases depend on the approvals from earlier ones, so legal accuracy is built in from the start rather than checked at the end.</p>
+<ol class="steps">
+
+<li><strong>Legal process discovery</strong>Work with GRIT's legal experts to map the protection order process, including exceptions, supporting documents and what happens after an application is prepared.
+<div class="phase-box">
+<h4>Purpose</h4>
+<p>To understand the full legal journey from the applicant's point of view before deciding what the system should do. The protection order process does not end when the form is completed: the applicant still has to have it commissioned, see the magistrate, arrange service on the respondent and return to court for the final order.</p>
+<h4>Activities</h4>
+<ul>
+<li>Workshops with GRIT's legal team to walk through the process step by step, from the first decision to apply to the final order and what happens if the order is breached.</li>
+<li>Mapping the different pathways: applying for oneself, a helper applying on someone's behalf, applications involving children, urgent and after-hours applications, and situations where there is no domestic relationship and another process applies.</li>
+<li>Identifying the decision points where the applicant needs information, the points where the clerk or magistrate decides, and the points where a referral is needed.</li>
+<li>Listing every document involved at each step: the application, the applicant's confidential details, supporting affidavits, the interim order, the notice of the return date, the final order and the warrant of arrest.</li>
+<li>Reviewing the existing prototype and GRIT's current guides against the mapped process to see what is already covered and what is missing.</li>
+<li>Agreeing the scope of the first version: which process, which jurisdiction, and whether the tool prepares documents only.</li>
+</ul>
+<h4>Outputs</h4>
+<ul>
+<li>A process map of the protection order journey, including exceptions and what happens after submission.</li>
+<li>A list of decision points, branches and referral points.</li>
+<li>An agreed scope statement for the first version.</li>
+<li>Answers, or owners and dates, for the questions in section 10.</li>
+</ul>
+<h4>Who is involved</h4>
+<p>GRIT's legal team, the AI Lead, the safeguarding lead, and where possible a paralegal or court support worker who sees applicants in practice.</p>
+<p class="done"><strong>Complete when:</strong> the legal team has reviewed and agreed the process map and the scope of the first version.</p>
+</div></li>
+
+<li><strong>Source and data collection</strong>Collect current legislation, regulations, official forms, court guidance, approved explanations and verified procedural information.
+<div class="phase-box">
+<h4>Purpose</h4>
+<p>To build the legal knowledge repository from authoritative, current sources, with every item recorded using the metadata in section 4 and reviewed before it is used.</p>
+<h4>Sources to collect for the protection order module</h4>
+<table><thead><tr><th>Category</th><th>Sources</th><th>What it is used for</th></tr></thead><tbody>
+<tr><td><strong>Primary legislation</strong></td><td>Domestic Violence Act 116 of 1998, in its current consolidated form, including the amendments made by the Domestic Violence Amendment Act 14 of 2021</td><td>Who can apply, what counts as domestic violence, the relationships covered, what the court can order, the duties of the police and the clerk</td></tr>
+<tr><td><strong>Regulations and forms</strong></td><td>The Domestic Violence Regulations as amended on 7 March 2025, and the prescribed forms, including Form 6 and Form 6A (J480E, March 2025) and the forms for the interim order, notice of the return date, final order and warrant of arrest</td><td>The procedure, the exact fields required, and the documents the applicant will receive after applying</td></tr>
+<tr><td><strong>Court process and practice</strong></td><td>Department of Justice guidance on protection orders, court practice on after-hours and urgent applications, service of documents by the sheriff or police, return dates, and supporting affidavits</td><td>Accurate explanations of what happens next and what the applicant must do</td></tr>
+<tr><td><strong>Police duties</strong></td><td>Police duties under the Act and the current police instructions on domestic violence, including how to report a breach of an order</td><td>Explaining what the police must do and what to do if the order is broken</td></tr>
+<tr><td><strong>Related legislation</strong></td><td>Relevant parts of the Children's Act 38 of 2005, the Maintenance Act 99 of 1998, the Criminal Law (Sexual Offences and Related Matters) Amendment Act 32 of 2007, and the Protection from Harassment Act 17 of 2011</td><td>Situations involving children, maintenance, sexual offences, and people who are not in a domestic relationship</td></tr>
+<tr><td><strong>Data protection</strong></td><td>The Protection of Personal Information Act 4 of 2013 and the Information Regulator's guidance on special personal information and children's personal information</td><td>The privacy design, consent, notices and the assessment of external AI processing</td></tr>
+<tr><td><strong>GRIT's approved content</strong></td><td>GRIT's protection order guide, guidance on clear and effective statements, guidance on what magistrates look for, the rights and referral guide, and the evidence guide</td><td>Plain-language explanations and guidance used in the conversation, each to be reviewed and approved as a record</td></tr>
+<tr><td><strong>Safety content</strong></td><td>GRIT's danger phrases, approved emergency replies and support wording, in English, isiZulu and Afrikaans</td><td>Responding safely when an applicant is in danger or distressed</td></tr>
+<tr><td><strong>Court and service information</strong></td><td>A verified list of Magistrates' Courts, police stations and support services, with locations, contact details and hours</td><td>Telling applicants where to go and where to get help; to be maintained jointly with GRIT's other services</td></tr>
+<tr><td><strong>Language resources</strong></td><td>An approved glossary of legal terms in English, isiZulu and Afrikaans, and approved translations of explanations</td><td>Consistent, accurate explanations in each language, while the form itself is completed in English</td></tr>
+</tbody></table>
+<h4>Activities</h4>
+<ul>
+<li>Obtaining each source from its official origin, such as the Department of Justice, the Government Gazette or the Information Regulator, and recording where it came from.</li>
+<li>Confirming that each source is the current version and recording its effective date.</li>
+<li>Extracting the relevant sections and writing an approved plain-language explanation for each.</li>
+<li>Entering every source as a record with the fields in section 4, starting with the status "draft".</li>
+<li>Legal review and approval of each record, with the reviewer and review date recorded.</li>
+<li>Writing evaluation cases with the legal team: realistic but fictional scenarios with the expected result, including difficult and unusual cases. Real applicants' cases are never used.</li>
+</ul>
+<h4>Outputs</h4>
+<ul>
+<li>A legal knowledge repository with every source recorded, reviewed and approved.</li>
+<li>Approved plain-language explanations and glossary.</li>
+<li>A first set of evaluation cases.</li>
+</ul>
+<h4>Who is involved</h4>
+<p>The legal team (sourcing and approval), the AI Lead (structure and records), the Tech Lead (data entry and checks), native-speaker reviewers (translations) and the safeguarding lead (safety content).</p>
+<p class="done"><strong>Complete when:</strong> every source needed for the first module is recorded with the status "approved", and none of the sources the module relies on is marked "draft" or "under review".</p>
+</div></li>
+
+<li><strong>Workflow and architecture design</strong>Design the questionnaire, branching logic, data model, legal rules, document-generation process and integration points.
+<div class="phase-box">
+<h4>Purpose</h4>
+<p>To turn the approved process map and sources into a precise design that can be built and tested, and that the legal team can read and approve without reading code.</p>
+<h4>Activities</h4>
+<ul>
+<li>Writing every question in plain language, with an explanation of why it is asked, in each supported language.</li>
+<li>Defining for each question whether it is required or optional, what counts as a valid answer, and what happens if the applicant does not know or does not want to answer.</li>
+<li>Defining the branches, for example when the applicant is applying for someone else, when children are involved, or when the matter is urgent.</li>
+<li>Writing the legal rules, each linked to the source it comes from.</li>
+<li>Mapping every answer to the exact box on the official form, including tick boxes.</li>
+<li>Designing the data model for case information, with the minimum fields the form requires and nothing more.</li>
+<li>Defining where AI is used and where it is not, following section 7, and how the applicant reviews any AI-assisted wording.</li>
+<li>Defining the integration points: the website, WhatsApp, the AI services, document generation, and the safety and support services.</li>
+<li>Completing the data protection assessment of the design with the Information Officer.</li>
+</ul>
+<h4>Outputs</h4>
+<ul>
+<li>The workflow definition, written in a structured, readable format.</li>
+<li>The legal rules, each linked to an approved source.</li>
+<li>The field mapping to Form 6 and Form 6A.</li>
+<li>The case data model and the data protection assessment.</li>
+<li>The technical architecture, including hosting, security and integration points.</li>
+</ul>
+<h4>Who is involved</h4>
+<p>The AI Lead (design), the legal team (rules and questions), the Information Officer (data protection), the safeguarding lead (sensitive questions and safety pathways) and native-speaker reviewers (questions in each language).</p>
+<p class="done"><strong>Complete when:</strong> the legal team has approved the workflow, rules and field mapping, and the Information Officer has signed off the data protection assessment.</p>
+</div></li>
+
+<li><strong>Build the first legal module</strong>Implement the protection order workflow, connect it to the legal knowledge service and build document generation.
+<div class="phase-box">
+<h4>Purpose</h4>
+<p>To build the protection order module on the shared platform, so that later legal modules can reuse the same services.</p>
+<h4>Activities</h4>
+<ul>
+<li>Building the shared platform services: safety checks, languages, voice input and listening, channels, consent and usage counters.</li>
+<li>Implementing the workflow engine to run the approved workflow definition.</li>
+<li>Connecting the legal knowledge service so that only approved records are used, with source references.</li>
+<li>Building document generation on the official fillable form, with completeness checks and a review step for the applicant.</li>
+<li>Adding the "Things to bring to court" checklist and the "what happens next" information.</li>
+<li>Implementing the privacy and security controls from section 8.</li>
+<li>Deploying to GRIT's own hosting accounts, with keys and settings held securely outside the code.</li>
+<li>Building automated tests that run after every change, so that changes to the workflow or AI model cannot silently break the module.</li>
+</ul>
+<h4>Outputs</h4>
+<ul>
+<li>A working protection order module in a test environment.</li>
+<li>Generated documents that match the official forms.</li>
+<li>Automated tests and technical documentation.</li>
+</ul>
+<h4>Who is involved</h4>
+<p>The AI Lead and Tech Lead, with developer support as budgeted.</p>
+<p class="done"><strong>Complete when:</strong> the full workflow can be completed end to end in the test environment in every supported language, and produces a correct, complete official form.</p>
+</div></li>
+
+<li><strong>Testing and legal validation</strong>Test standard cases, unusual circumstances, missing information, applicants acting on behalf of others, child-related scenarios and contradictory answers.
+<div class="phase-box">
+<h4>Purpose</h4>
+<p>To show, before any real applicant uses the module, that it is accurate, complete, safe and understandable.</p>
+<h4>What is tested</h4>
+<ul>
+<li><strong>Standard cases:</strong> typical applications completed correctly from start to finish.</li>
+<li><strong>Unusual circumstances:</strong> uncommon relationships, several respondents or incidents, applicants without identity documents.</li>
+<li><strong>Missing information:</strong> applicants who do not know dates, addresses or the respondent's details.</li>
+<li><strong>Applicants acting on behalf of others:</strong> the consent and capacity requirements are applied correctly.</li>
+<li><strong>Child-related scenarios:</strong> children affected, and applications involving maintenance or contact.</li>
+<li><strong>Contradictory answers:</strong> the system notices contradictions and asks the applicant rather than choosing for them.</li>
+<li><strong>Safety:</strong> danger, self-harm and distress are always met with the approved safety responses.</li>
+<li><strong>Language:</strong> conversations in each supported language, mixed languages and spoken input, with the form completed faithfully in English.</li>
+<li><strong>Faithfulness:</strong> the generated documents contain only what the applicant said, without added, softened or strengthened facts.</li>
+<li><strong>Privacy and security:</strong> data is handled as designed, and nothing is stored or shared that should not be.</li>
+<li><strong>Usability:</strong> testing with people who represent the intended users, including people with limited reading ability, supported by a counsellor.</li>
+</ul>
+<h4>Outputs</h4>
+<ul>
+<li>A test report, with every issue found and how it was resolved.</li>
+<li>A legal validation sign-off of the generated documents and explanations.</li>
+<li>A safeguarding sign-off of the safety responses.</li>
+</ul>
+<h4>Who is involved</h4>
+<p>The legal team, the safeguarding lead, native-speaker reviewers, the AI Lead and Tech Lead, and user testers supported by a counsellor.</p>
+<p class="done"><strong>Complete when:</strong> all agreed tests pass, no serious issue remains open, and the legal and safeguarding leads have signed off.</p>
+</div></li>
+
+<li><strong>Controlled deployment</strong>Pilot with appropriate users and legal support, review performance and errors, and expand only after the required approvals.
+<div class="phase-box">
+<h4>Purpose</h4>
+<p>To learn from real use in a safe, supported setting before the module is offered widely.</p>
+<h4>Activities</h4>
+<ul>
+<li>Running a pilot with partner organisations, such as paralegals, shelters and court support services, so that pilot users have a trained person available to help them.</li>
+<li>Monitoring content-free usage counters: how many applications are started and completed, which languages and channels are used, and where people stop.</li>
+<li>Collecting feedback from pilot users and the people supporting them.</li>
+<li>Reviewing errors and near-misses regularly with the legal and safeguarding leads, and correcting them.</li>
+<li>Re-running the evaluation tests after every change before it reaches pilot users.</li>
+<li>Agreeing the criteria for wider release, and using what the pilot shows to choose the next legal module.</li>
+</ul>
+<h4>Outputs</h4>
+<ul>
+<li>A pilot report covering use, errors, feedback and changes made.</li>
+<li>A decision on wider release, approved by GRIT's leadership.</li>
+<li>A recommendation for the next legal module.</li>
+</ul>
+<h4>Who is involved</h4>
+<p>Partner organisations and their staff, the legal team, the safeguarding lead, the AI Lead and Tech Lead, and GRIT's leadership for the release decision.</p>
+<p class="done"><strong>Complete when:</strong> the pilot has met the agreed criteria and GRIT's leadership has approved wider release.</p>
+</div></li>
+</ol>
+
+<h2>10. Decisions and information required from GRIT</h2>
+<p>The following questions need to be resolved with the legal, product and technical teams before the architecture and data collection approach are finalised. The second column explains how each answer affects the design.</p>
+<table><thead><tr><th>Question</th><th>Why it matters</th></tr></thead><tbody>
+<tr><td>1. Which exact legal process should the first version of inFORMed support?</td><td>Determines the legislation, forms, workflow and evaluation cases to prepare first.</td></tr>
+<tr><td>2. Is the first version exclusively for South Africa, or should it support other jurisdictions?</td><td>Other jurisdictions would need their own legal sources, rules, forms and reviewers.</td></tr>
+<tr><td>3. Who will provide and approve legal interpretations and workflow rules?</td><td>Every legal record and rule needs a named reviewer before it can be used.</td></tr>
+<tr><td>4. Which official forms and supporting documents must the tool prepare?</td><td>Determines the document templates and the field mapping.</td></tr>
+<tr><td>5. Which information is legally required, and which information is optional?</td><td>Sets the minimum data the platform collects, and therefore its privacy footprint.</td></tr>
+<tr><td>6. What exceptions and special circumstances must the workflow recognise?</td><td>Each exception becomes a branch in the workflow and a set of test cases.</td></tr>
+<tr><td>7. Will the first version only prepare documents, or is electronic submission a future requirement?</td><td>Electronic submission would require integration with court systems and much stricter identity and security controls.</td></tr>
+<tr><td>8. What should happen when a user cannot answer a question or does not have the required information?</td><td>Decides whether questions can be skipped and how gaps are shown on the documents and explained to the applicant.</td></tr>
+<tr><td>9. Will legal practitioners or trained support workers review applications before users download or submit them?</td><td>If yes, case information must be shared with reviewers, which requires consent, secure storage, access control and audit logs.</td></tr>
+<tr><td>10. What personal information must be retained, for how long, and who is authorised to access it?</td><td>Determines whether case information is stored at all, and the retention, deletion and access rules if it is.</td></tr>
+</tbody></table>
+
+<h2>11. Initial design principles</h2>
+<div class="cards">
+<div class="card"><h3>Legal accuracy first</h3><p>Use current, authoritative sources and require legal approval for legal rules, explanations and document templates.</p></div>
+<div class="card"><h3>Structured before generative</h3><p>Use explicit workflows and validation for legally significant steps. Use AI to support, not replace, these controls.</p></div>
+<div class="card"><h3>User control</h3><p>Users must be able to review, correct and approve information and documents prepared on their behalf.</p></div>
+<div class="card"><h3>Privacy by design</h3><p>Separate case information from general legal knowledge and apply strict controls to sensitive information.</p></div>
+<div class="card"><h3>Modular and extensible</h3><p>Build shared platform services and independent legal modules that can be added and maintained separately.</p></div>
+<div class="card"><h3>Traceable and testable</h3><p>Connect legal content and rules to their sources, versions, approvals and evaluation tests.</p></div>
+</div>
+
+<h2>12. Roles and responsibilities</h2>
+<table><thead><tr><th>Role</th><th>Responsibility</th><th>Approves</th></tr></thead><tbody>
+<tr><td>Chief Executive</td><td>Final decisions for GRIT</td><td>Pilot, wider release, budget and data policy</td></tr>
+<tr><td>Legal reviewer</td><td>Legal sources, explanations, rules, workflow and document templates</td><td>Every legal record and workflow version</td></tr>
+<tr><td>Safeguarding lead</td><td>Danger and distress responses, sensitive questions, support wording</td><td>All safety content, in every language</td></tr>
+<tr><td>Information Officer</td><td>POPIA compliance, privacy notices, agreements with service providers</td><td>The data protection assessment</td></tr>
+<tr><td>AI Lead</td><td>Product direction, architecture, AI use and evaluation</td><td>Technical design and releases</td></tr>
+<tr><td>Tech Lead</td><td>Data entry and checks, usage counters, testing support</td><td>Data quality</td></tr>
+<tr><td>Native-speaker reviewers</td><td>Questions, explanations and glossary in each language</td><td>Translations</td></tr>
+<tr><td>Partner organisations</td><td>Supporting applicants during the pilot and giving feedback</td><td>(Feedback)</td></tr>
+</tbody></table>
+
+<h2>13. Glossary</h2>
+<dl class="gloss">
+<dt>Protection order</dt><dd>A court order that prohibits a person from committing domestic violence and related acts. An interim order can be granted quickly; a final order is decided on the return date.</dd>
+<dt>Applicant and respondent</dt><dd>The applicant is the person asking for protection. The respondent is the person the order is made against.</dd>
+<dt>Interim order and return date</dt><dd>A temporary order granted before the respondent is heard, and the later court date on which the magistrate decides whether to make the order final.</dd>
+<dt>Workflow engine</dt><dd>The part of the platform that decides which questions are asked, in what order, and which are required.</dd>
+<dt>Legal rules engine</dt><dd>The part of the platform that applies approved legal and procedural rules, each linked to its source.</dd>
+<dt>Legal knowledge service</dt><dd>The repository of approved, versioned legal sources and explanations used by the platform.</dd>
+<dt>RAG</dt><dd>Retrieval-augmented generation: searching approved content for relevant passages and giving them to the AI, so that answers come from verified sources with references.</dd>
+<dt>Evaluation data</dt><dd>Fictional test cases with expected results, used to measure accuracy, completeness and safety. Never real applicants' cases.</dd>
+<dt>Special personal information</dt><dd>Information that POPIA protects more strictly, including information about health and alleged criminal behaviour.</dd>
+<dt>Information Officer</dt><dd>The person responsible for an organisation's compliance with POPIA.</dd>
+</dl>
+
+<div class="footer">
+<div><strong>inFORMed | Proposed Platform Architecture and Data Framework</strong><br>Prepared by Zione Kamtambe</div>
+<div>Working document · For internal discussion and legal/technical validation</div>
+</div>
+</main>
+</div>
+</body>
+</html>
